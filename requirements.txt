@@ -1,0 +1,12 @@
+azure-mgmt-resource
+azure-mgmt-storage
+azure-mgmt-compute
+azure-mgmt-network
+azure.mgmt.rdbms
+azure-identity
+azure-storage-blob
+azure-mgmt-web
+mysql
+mysql-connector
+black
+isort
