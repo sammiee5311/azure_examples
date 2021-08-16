@@ -1,15 +1,11 @@
-import random
 import sys
 
 sys.path.append("..")
 
-from azure_main import (
-    Azure,
-    AzureNames,
-    AzureResourceManagement,
-    AzureStorageManagement,
-)
+from azure_main import Azure
+from azure_sdk import AzureResourceManagement, AzureStorageManagement
 from config.errors import NameNotValid
+from config.names import AzureNames
 
 LOCATION = "centralus"
 STORAGE_ACCOUNT_NAME = f"pythonazurestorage00"

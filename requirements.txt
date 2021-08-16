@@ -10,3 +10,4 @@ mysql
 mysql-connector
 black
 isort
+pyyaml

@@ -2,12 +2,9 @@ import sys
 
 sys.path.append("..")
 
-from azure_main import (
-    Azure,
-    AzureNames,
-    AzureResourceManagement,
-    AzureWebSiteManagement,
-)
+from azure_main import Azure
+from azure_sdk import AzureResourceManagement, AzureWebSiteManagement
+from config.names import AzureNames
 
 REPO_URL = ""
 LOCATION = "centralus"

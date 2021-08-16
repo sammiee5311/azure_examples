@@ -14,7 +14,13 @@ class Config:
 
     def __enter__(self):
         try:
-            return yaml.load(open(self.file), Loader=yaml.FullLoader)["AZURE"][self.target]
+            data = yaml.load(open(self.file), Loader=yaml.FullLoader)
+
+            for value, key in data.items():
+                for name in key:
+                    if self.target == name:
+                        return data[value][name]
+
         except FileNotFoundError:
             raise ConfigFileNotExist(f"Please Check whether {self.file!r} exists or not")
 

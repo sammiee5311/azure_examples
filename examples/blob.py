@@ -2,7 +2,9 @@ import sys
 
 sys.path.append("..")
 
-from azure_main import Azure, AzureBlob, AzureNames, AzureStorageManagement
+from azure_main import Azure
+from azure_sdk import AzureBlob, AzureStorageManagement
+from config.names import AzureNames
 
 STORAGE_ACCOUNT_NAME = "pythonazurestorage00"
 
@@ -26,5 +28,5 @@ conn_string = azure_storage.sdk.get_conn_string(keys)
 azure_blob.sdk.set_conn_string(conn_string)
 azure_blob.sdk.set_client()
 
-with open("./files/sample-source.txt", "rb") as data:
+with open("../files/sample-source.txt", "rb") as data:
     azure_blob.sdk.upload_blob(data)
