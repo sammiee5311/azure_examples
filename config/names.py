@@ -10,3 +10,4 @@ class AzureNames:
     storage: Optional[str] = None
     service_plan: Optional[str] = None
     web_app: Optional[str] = None
+    rule: Optional[str] = None

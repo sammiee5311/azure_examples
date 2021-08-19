@@ -25,7 +25,7 @@ azure_storage = Azure(azure_storage_sdk, names)
 resource_value = {"location": LOCATION}
 storage_value = {"location": LOCATION, "kind": "StorageV2", "sku": {"name": "Standard_LRS"}}
 
-azure_resource.sdk.create(resource_value)
+azure_resource.sdk.create_resoruce(resource_value)
 
 if azure_storage.sdk.is_name_available_to_use():
     poller = azure_storage.sdk.create_storage(value=storage_value)

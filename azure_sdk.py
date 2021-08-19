@@ -1,5 +1,12 @@
 from abc import ABC, abstractmethod
 
+import mysql.connector
+from azure.mgmt.rdbms.mysql import MySQLManagementClient
+from azure.mgmt.rdbms.mysql.models import (
+    ServerForCreate,
+    ServerPropertiesForDefaultCreate,
+    ServerVersion,
+)
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.web import WebSiteManagementClient
@@ -34,6 +41,10 @@ class AzureSDK(ABC):
         return names
 
 
+class AzureDatabaseManagement(AzureSDK):
+    pass
+
+
 class AzureResourceManagement(AzureSDK):
     def __init__(self, credential: Credtential = CliCredential()):
         self.credential = credential.get_credential()
@@ -46,7 +57,7 @@ class AzureResourceManagement(AzureSDK):
         names = self.get_names(resource_group=resource_group)
         return self.client.resources.list_by_resource_group(*names, expand=expand)
 
-    def create(self, value, resource_group=None):
+    def create_resoruce(self, value, resource_group=None):
         names = self.get_names(resource_group=resource_group)
         result = self.client.resource_groups.create_or_update(*names, value)
 
@@ -161,3 +172,54 @@ class AzureWebSiteManagement(AzureSDK):
     def create_source_control(self, value, resource_group=None, web_app=None):
         names = self.get_names(resource_group=resource_group, web_app=web_app)
         return self.client.web_apps.begin_create_or_update_source_control(*names, value)
+
+
+class AzureMySQLManagement(AzureDatabaseManagement):
+    def __init__(self, credential: Credtential = CliCredential()):
+        self.credential = credential.get_credential()
+        self.client = MySQLManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
+        self.server_name, self.admin_name, self.admin_password, self.ip_address, self.name, self.port = get_config(
+            "SEVER_NAME,ADMIN_NAME,ADMIN_PASSWORD,PUBLIC_IP_ADDRESS,NAME,PORT"
+        )
+
+    def create_servers(self, location, version, resource_group=None):
+        names = self.get_names(resource_group=resource_group)
+        poller = self.client.servers.begin_create(
+            *names,
+            self.server_name,
+            ServerForCreate(
+                location=location,
+                properties=ServerPropertiesForDefaultCreate(
+                    administrator_login=self.admin_name,
+                    administrator_login_password=self.admin_password,
+                    version=getattr(ServerVersion, version),
+                ),
+            ),
+        )
+        return poller.result()
+
+    def create_firewall_rules(self, rule, resource_group=None):
+        names = self.get_names(resource_group=resource_group)
+        poller = self.client.firewall_rules.begin_create_or_update(
+            *names, self.server_name, rule, {"start_ip_address": self.ip_address, "end_ip_address": self.ip_address}
+        )
+
+        return poller.result()
+
+    def create_database(self, value, resource_group=None):
+        names = self.get_names(resource_group=resource_group)
+        poller = self.client.databases.begin_create_or_update(*names, self.server_name, self.name, value)
+
+        return poller.result()
+
+    def connect_to_database(self):
+        connection = mysql.connector.connect(
+            user=f"{self.admin_name}@{self.server_name}",
+            password=self.admin_password,
+            host=f"{self.server_name}.mysql.database.azure.com",
+            port=self.port,
+            database=self.name,
+            ssl_ca="../files/BaltimoreCyberTrustRoot.crt.pem",
+        )
+
+        return connection

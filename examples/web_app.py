@@ -21,7 +21,7 @@ azure_web_sdk = AzureWebSiteManagement()
 azure_resource = Azure(azure_resource_sdk, names)
 azure_web = Azure(azure_web_sdk, names)
 
-azure_resource.sdk.create({"location": LOCATION})
+azure_resource.sdk.create_resoruce({"location": LOCATION})
 
 poller = azure_web.sdk.create_app_service_plans({"location": LOCATION, "reserved": True, "sku": {"name": "B1"}})
 
