@@ -14,7 +14,7 @@ from azure.storage.blob import BlobClient
 
 from config.config import Config
 from config.names import AzureNames
-from credential import CliCredential, Credtential
+from credential import CliCredential, Credential
 
 
 def get_config(name):
@@ -46,7 +46,7 @@ class AzureDatabaseManagement(AzureSDK):
 
 
 class AzureResourceManagement(AzureSDK):
-    def __init__(self, credential: Credtential = CliCredential()):
+    def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
         self.client = ResourceManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
 
@@ -96,7 +96,7 @@ class AzureResourceManagement(AzureSDK):
 
 
 class AzureStorageManagement(AzureSDK):
-    def __init__(self, credential: Credtential = CliCredential()):
+    def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
         self.client = StorageManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
         self.conn_string = None
@@ -134,7 +134,7 @@ class AzureStorageManagement(AzureSDK):
 
 
 class AzureBlob(AzureSDK):
-    def __init__(self, conn_string=None, credential: Credtential = CliCredential()):
+    def __init__(self, conn_string=None, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
         self.conn_string = conn_string
         self.client = None
@@ -154,7 +154,7 @@ class AzureBlob(AzureSDK):
 
 
 class AzureWebSiteManagement(AzureSDK):
-    def __init__(self, credential: Credtential = CliCredential()):
+    def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
         self.client = WebSiteManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
 
@@ -175,7 +175,7 @@ class AzureWebSiteManagement(AzureSDK):
 
 
 class AzureMySQLManagement(AzureDatabaseManagement):
-    def __init__(self, credential: Credtential = CliCredential()):
+    def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
         self.client = MySQLManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
         self.server_name, self.admin_name, self.admin_password, self.ip_address, self.name, self.port = get_config(

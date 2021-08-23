@@ -3,17 +3,17 @@ from abc import ABC, abstractmethod
 from azure.identity import AzureCliCredential, DefaultAzureCredential
 
 
-class Credtential(ABC):
+class Credential(ABC):
     @abstractmethod
     def get_credential(self):
         pass
 
 
-class CliCredential(Credtential):
+class CliCredential(Credential):
     def get_credential(self):
         return AzureCliCredential()
 
 
-class DefaultCredential(Credtential):
+class DefaultCredential(Credential):
     def get_credential(self):
         return DefaultAzureCredential()
