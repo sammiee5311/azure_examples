@@ -11,3 +11,9 @@ class AzureNames:
     service_plan: Optional[str] = None
     web_app: Optional[str] = None
     rule: Optional[str] = None
+    vnet: Optional[str] = None
+    subnet: Optional[str] = None
+    ip: Optional[str] = None
+    ip_config: Optional[str] = None
+    nic: Optional[str] = None
+    vm: Optional[str] = None

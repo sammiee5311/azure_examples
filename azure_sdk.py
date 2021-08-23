@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
 import mysql.connector
+from azure.mgmt.compute import ComputeManagementClient
+from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.rdbms.mysql import MySQLManagementClient
 from azure.mgmt.rdbms.mysql.models import (
     ServerForCreate,
@@ -223,3 +225,62 @@ class AzureMySQLManagement(AzureDatabaseManagement):
         )
 
         return connection
+
+
+class AzureNetworkManagement(AzureSDK):
+    def __init__(self, credential: Credential = CliCredential()):
+        self.credential = credential.get_credential()
+        self.client = NetworkManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
+
+    def create_vnets(self, value, resource_group=None, vnet=None):
+        names = self.get_names(resource_group=resource_group, vnet=vnet)
+        poller = self.client.virtual_networks.begin_create_or_update(*names, value)
+        vnet_result = poller.result()
+
+        print(
+            f"Provisioned virtual network {vnet_result.name} with address prefixes {vnet_result.address_space.address_prefixes}"
+        )
+
+        return vnet_result
+
+    def create_subnets(self, value, resource_group=None, vnet=None, subnet=None):
+        names = self.get_names(resource_group=resource_group, vnet=vnet, subnet=subnet)
+        poller = self.client.subnets.begin_create_or_update(*names, value)
+        subnet_result = poller.result()
+
+        print(f"Provisioned virtual subnet {subnet_result.name} with address prefix {subnet_result.address_prefix}")
+
+        return subnet_result
+
+    def create_public_ip_addresses(self, value, resource_group=None, ip=None):
+        names = self.get_names(resource_group=resource_group, ip=ip)
+        poller = self.client.public_ip_addresses.begin_create_or_update(*names, value)
+        ip_address_result = poller.result()
+
+        print(f"Provisioned public IP address {ip_address_result.name} with address {ip_address_result.ip_address}")
+
+        return ip_address_result
+
+    def create_network_interfaces(self, value, resource_group=None, nic=None):
+        names = self.get_names(resource_group=resource_group, nic=nic)
+        poller = self.client.network_interfaces.begin_create_or_update(*names, value)
+        nic_result = poller.result()
+
+        print(f"Provisioned network interface client {nic_result.name}")
+
+        return nic_result
+
+
+class AzureComputeManagement(AzureSDK):
+    def __init__(self, credential: Credential = CliCredential()):
+        self.credential = credential.get_credential()
+        self.client = ComputeManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
+
+    def create_virtual_machines(self, value, resource_group=None, vm=None):
+        names = self.get_names(resource_group=resource_group, vm=vm)
+        poller = self.client.virtual_machines.begin_create_or_update(*names, value)
+        vm_result = poller.result()
+
+        print(f"Provisioned virtual machine {vm_result.name}")
+
+        return vm_result
