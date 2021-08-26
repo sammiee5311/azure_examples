@@ -111,11 +111,20 @@ class AzureStorageManagement(AzureSDK):
 
     def create_storage(self, value, resource_group=None, storage=None):
         names = self.get_names(resource_group=resource_group, storage=storage)
-        return self.client.storage_accounts.begin_create(*names, value)
+        poller = self.client.storage_accounts.begin_create(*names, value)
+        account_result = poller.result()
+
+        print(f"Provisioned storage account {account_result.name!r}")
+
+        return account_result
 
     def create_blob_containers(self, value, resource_group=None, storage=None, container=None):
         names = self.get_names(resource_group=resource_group, storage=storage, container=container)
-        return self.client.blob_containers.create(*names, value)
+        container = self.client.blob_containers.create(*names, value)
+        
+        print(f"Provisioned storage account {container.name!r}")
+
+        return container
 
     def get_keys(self, resource_group=None, show=True):
         names = self.get_names(resource_group=resource_group)
@@ -165,15 +174,30 @@ class AzureWebSiteManagement(AzureSDK):
 
     def create_app_service_plans(self, value, resource_group=None, service_plan=None):
         names = self.get_names(resource_group=resource_group, service_plan=service_plan)
-        return self.client.app_service_plans.begin_create_or_update(*names, value)
+        poller = self.client.app_service_plans.begin_create_or_update(*names, value)
+        plan_result = poller.result()
+
+        print(f"Provisioned App Service plan {plan_result.name}")
+
+        return plan_result
 
     def create_web_apps(self, value, resource_group=None, web_app=None):
         names = self.get_names(resource_group=resource_group, web_app=web_app)
-        return self.client.web_apps.begin_create_or_update(*names, value)
+        poller =  self.client.web_apps.begin_create_or_update(*names, value)
+        web_app_result = poller.result()
+
+        print(f"Provisioned web app {web_app_result.name} at {web_app_result.default_host_name}")
+
+        return web_app_result
 
     def create_source_control(self, value, resource_group=None, web_app=None):
         names = self.get_names(resource_group=resource_group, web_app=web_app)
-        return self.client.web_apps.begin_create_or_update_source_control(*names, value)
+        poller =  self.client.web_apps.begin_create_or_update_source_control(*names, value)
+        sc_result = poller.result()
+
+        print(f"Set source control on web app to {sc_result.branch} branch of {sc_result.repo_url}")
+
+        return sc_result
 
 
 class AzureMySQLManagement(AzureDatabaseManagement):

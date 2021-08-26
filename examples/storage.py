@@ -28,17 +28,11 @@ storage_value = {"location": LOCATION, "kind": "StorageV2", "sku": {"name": "Sta
 azure_resource.sdk.create_resoruce(resource_value)
 
 if azure_storage.sdk.is_name_available_to_use():
-    poller = azure_storage.sdk.create_storage(value=storage_value)
-
-    account_result = poller.result()
-
-    print(f"Provisioned storage account {account_result.name!r}")
+    account_result = azure_storage.sdk.create_storage(value=storage_value)
 
     keys = azure_storage.sdk.get_keys()
     azure_storage.sdk.get_conn_string(keys)
 
     container = azure_storage.sdk.create_blob_containers({})
-
-    print(f"Provisioned storage account {container.name!r}")
 else:
     raise NameNotValid(f"{STORAGE_ACCOUNT_NAME!r} is not vaild name for a stroage account name")

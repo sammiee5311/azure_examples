@@ -23,22 +23,10 @@ azure_web = Azure(azure_web_sdk, names)
 
 azure_resource.sdk.create_resoruce({"location": LOCATION})
 
-poller = azure_web.sdk.create_app_service_plans({"location": LOCATION, "reserved": True, "sku": {"name": "B1"}})
+plan_result = azure_web.sdk.create_app_service_plans({"location": LOCATION, "reserved": True, "sku": {"name": "B1"}})
 
-plan_result = poller.result()
-
-print(f"Provisioned App Service plan {plan_result.name}")
-
-poller = azure_web.sdk.create_web_apps(
+web_app_result = azure_web.sdk.create_web_apps(
     {"location": LOCATION, "server_farm_id": plan_result.id, "site_config": {"linux_fx_version": "python|3.8"}},
 )
 
-web_app_result = poller.result()
-
-print(f"Provisioned web app {web_app_result.name} at {web_app_result.default_host_name}")
-
-poller = azure_web.sdk.create_source_control({"location": "GitHub", "repo_url": REPO_URL, "branch": "master"})
-
-sc_result = poller.result()
-
-print(f"Set source control on web app to {sc_result.branch} branch of {sc_result.repo_url}")
+sc_result = azure_web.sdk.create_source_control({"location": "GitHub", "repo_url": REPO_URL, "branch": "master"})
