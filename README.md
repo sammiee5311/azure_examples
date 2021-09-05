@@ -8,9 +8,9 @@
 
 - `pip install -r requirements.txt`
 
-### config
+### env
 
-- Fill `SUBSCRIPTION_ID`, `TENANT_ID`, etc.. in config/config.yml.
+- Fill `SUBSCRIPTION_ID`, `TENANT_ID`, etc.. in config/.env
 - Download [BaltimoreCyberTrustRoot.crt.pem](https://www.digicert.com/CACerts/BaltimoreCyberTrustRoot.crt.pem).
 
 ### reference
