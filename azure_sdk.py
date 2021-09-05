@@ -14,14 +14,9 @@ from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.web import WebSiteManagementClient
 from azure.storage.blob import BlobClient
 
-from config.config import Config
+from config.config import get_env
 from config.names import AzureNames
 from credential import CliCredential, Credential
-
-
-def get_config(name):
-    with Config(name) as result:
-        return result
 
 
 class AzureSDK(ABC):
@@ -50,7 +45,7 @@ class AzureDatabaseManagement(AzureSDK):
 class AzureResourceManagement(AzureSDK):
     def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
-        self.client = ResourceManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
+        self.client = ResourceManagementClient(self.credential, get_env("SUBSCRIPTION_ID"))
 
     def __str__(self):
         return "ResourceManagement"
@@ -100,7 +95,7 @@ class AzureResourceManagement(AzureSDK):
 class AzureStorageManagement(AzureSDK):
     def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
-        self.client = StorageManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
+        self.client = StorageManagementClient(self.credential, get_env("SUBSCRIPTION_ID"))
         self.conn_string = None
 
     def __str__(self):
@@ -121,7 +116,7 @@ class AzureStorageManagement(AzureSDK):
     def create_blob_containers(self, value, resource_group=None, storage=None, container=None):
         names = self.get_names(resource_group=resource_group, storage=storage, container=container)
         container = self.client.blob_containers.create(*names, value)
-        
+
         print(f"Provisioned storage account {container.name!r}")
 
         return container
@@ -167,7 +162,7 @@ class AzureBlob(AzureSDK):
 class AzureWebSiteManagement(AzureSDK):
     def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
-        self.client = WebSiteManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
+        self.client = WebSiteManagementClient(self.credential, get_env("SUBSCRIPTION_ID"))
 
     def __str__(self):
         return "WebSiteManagement"
@@ -183,7 +178,7 @@ class AzureWebSiteManagement(AzureSDK):
 
     def create_web_apps(self, value, resource_group=None, web_app=None):
         names = self.get_names(resource_group=resource_group, web_app=web_app)
-        poller =  self.client.web_apps.begin_create_or_update(*names, value)
+        poller = self.client.web_apps.begin_create_or_update(*names, value)
         web_app_result = poller.result()
 
         print(f"Provisioned web app {web_app_result.name} at {web_app_result.default_host_name}")
@@ -192,7 +187,7 @@ class AzureWebSiteManagement(AzureSDK):
 
     def create_source_control(self, value, resource_group=None, web_app=None):
         names = self.get_names(resource_group=resource_group, web_app=web_app)
-        poller =  self.client.web_apps.begin_create_or_update_source_control(*names, value)
+        poller = self.client.web_apps.begin_create_or_update_source_control(*names, value)
         sc_result = poller.result()
 
         print(f"Set source control on web app to {sc_result.branch} branch of {sc_result.repo_url}")
@@ -203,8 +198,8 @@ class AzureWebSiteManagement(AzureSDK):
 class AzureMySQLManagement(AzureDatabaseManagement):
     def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
-        self.client = MySQLManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
-        self.server_name, self.admin_name, self.admin_password, self.ip_address, self.name, self.port = get_config(
+        self.client = MySQLManagementClient(self.credential, get_env("SUBSCRIPTION_ID"))
+        self.server_name, self.admin_name, self.admin_password, self.ip_address, self.name, self.port = get_env(
             "SEVER_NAME,ADMIN_NAME,ADMIN_PASSWORD,PUBLIC_IP_ADDRESS,NAME,PORT"
         )
 
@@ -254,7 +249,7 @@ class AzureMySQLManagement(AzureDatabaseManagement):
 class AzureNetworkManagement(AzureSDK):
     def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
-        self.client = NetworkManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
+        self.client = NetworkManagementClient(self.credential, get_env("SUBSCRIPTION_ID"))
 
     def create_vnets(self, value, resource_group=None, vnet=None):
         names = self.get_names(resource_group=resource_group, vnet=vnet)
@@ -298,7 +293,7 @@ class AzureNetworkManagement(AzureSDK):
 class AzureComputeManagement(AzureSDK):
     def __init__(self, credential: Credential = CliCredential()):
         self.credential = credential.get_credential()
-        self.client = ComputeManagementClient(self.credential, get_config("SUBSCRIPTION_ID"))
+        self.client = ComputeManagementClient(self.credential, get_env("SUBSCRIPTION_ID"))
 
     def create_virtual_machines(self, value, resource_group=None, vm=None):
         names = self.get_names(resource_group=resource_group, vm=vm)

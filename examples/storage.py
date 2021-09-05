@@ -4,8 +4,12 @@ sys.path.append("..")
 
 from azure_main import Azure
 from azure_sdk import AzureResourceManagement, AzureStorageManagement
+from config.config import load_env
 from config.errors import NameNotValid
 from config.names import AzureNames
+
+load_env()
+
 
 LOCATION = "centralus"
 STORAGE_ACCOUNT_NAME = f"pythonazurestorage00"

@@ -8,7 +8,11 @@ from azure_sdk import (
     AzureNetworkManagement,
     AzureResourceManagement,
 )
+from config.config import load_env
 from config.names import AzureNames
+
+load_env()
+
 
 LOCATION = "westus"
 VM_NAME = "ExampleVM"

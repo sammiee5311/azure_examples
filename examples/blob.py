@@ -4,7 +4,10 @@ sys.path.append("..")
 
 from azure_main import Azure
 from azure_sdk import AzureBlob, AzureStorageManagement
+from config.config import load_env
 from config.names import AzureNames
+
+load_env()
 
 STORAGE_ACCOUNT_NAME = "pythonazurestorage00"
 

@@ -4,7 +4,10 @@ sys.path.append("..")
 
 from azure_main import Azure
 from azure_sdk import AzureResourceManagement, AzureWebSiteManagement
+from config.config import load_env
 from config.names import AzureNames
+
+load_env()
 
 REPO_URL = ""
 LOCATION = "centralus"
