@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
 import mysql.connector
+from azure.core.exceptions import ResourceNotFoundError
+from azure.keyvault.secrets import SecretClient
 from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.rdbms.mysql import MySQLManagementClient
@@ -16,7 +18,7 @@ from azure.storage.blob import BlobClient
 
 from config.config import get_env
 from config.names import AzureNames
-from credential import CliCredential, Credential
+from credential import CliCredential, Credential, DefaultCredential
 
 
 class AzureSDK(ABC):
@@ -303,3 +305,36 @@ class AzureComputeManagement(AzureSDK):
         print(f"Provisioned virtual machine {vm_result.name}")
 
         return vm_result
+
+
+class AzureSecret(AzureSDK):
+    def __init__(self, credential: Credential = CliCredential()):
+        self.credential = credential.get_credential()
+        self.key_vault_name = get_env("KEY_VAULT_NAME")[0]
+        self.client = SecretClient(
+            credential=self.credential, vault_url=f"https://{self.key_vault_name}.vault.azure.net"
+        )
+
+    def set_secret_key_value(self, key, value):
+        try:
+            self.client.get_secret(key)
+            print(f"{key!r} already exists in {self.key_vault_name!r}")
+        except ResourceNotFoundError:
+            self.client.set_secret(key, value)
+            print(f"Retrieving your secret from {self.key_vault_name!r}")
+
+    def get_secret_value(self, key):
+        try:
+            secret = self.client.get_secret(key)
+            print(f"Your secret is {secret.value!r}")
+
+            return secret.value
+        except ResourceNotFoundError as e:
+            print(e.message)
+
+    def delete_secret_key(self, key):
+        poller = self.client.begin_delete_secret(key)
+        deleted_key = poller.result
+        print(f"Your {key!r} is deleted successfully.")
+
+        return deleted_key
